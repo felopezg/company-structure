@@ -74,11 +74,11 @@ public final class OrganizationUnitsController {
                 ouRepository.getOrganizationalRelations(ou, willReportTo);
         ResponseEntity<List<OrganizationUnitResponse>> response = OK;
 
-        if (isNotAReportsToRelationPair(organizationalRelations.values())) {
+        if (isNotAReportsToRelationPair(organizationalRelations.values()) &&
+                ou != willReportTo) {
             response = NOT_FOUND;
         } else if (isRoot(organizationalRelations.get(ou))
-                || isReportsToRelationACycle(organizationalRelations.get(ou), organizationalRelations.get(willReportTo))
-                || organizationalRelations.get(ou).getReportsTo() == willReportTo) {
+                || isReportsToRelationACycle(organizationalRelations.get(ou), organizationalRelations.get(willReportTo))) {
             response = BAD_REQUEST;
         }
 

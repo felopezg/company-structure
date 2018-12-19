@@ -116,7 +116,7 @@ public class CompanyStructureApplicationTests {
                 HttpMethod.PUT,
                 new HttpEntity<>(new OrganizationUnitRequest(-1)),
                 OrganizationUnitNodeList.class,
-                ImmutableMap.of("ou", -1));
+                ImmutableMap.of("ou", -2));
 
 
         final OrganizationUnitNodeList response = updateResponse.getBody();

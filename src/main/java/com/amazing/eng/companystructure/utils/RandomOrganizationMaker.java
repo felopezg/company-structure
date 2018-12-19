@@ -101,6 +101,7 @@ public class RandomOrganizationMaker {
             }
         }
 
+        writer.write(String.format(ORGANIZATION_UNITS_ID_SEQUENCE_DROP));
         writer.write(String.format(ORGANIZATION_UNITS_ID_SEQUENCE_CREATE, SEQUENCE_ID + 1));
 
         writer.flush();
