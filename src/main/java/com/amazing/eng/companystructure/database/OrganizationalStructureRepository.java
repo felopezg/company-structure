@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -70,7 +71,7 @@ public class OrganizationalStructureRepository {
      * SQL statement for updating an Organization Unit's relations with itself and its dependants.
      */
     private static final String UPDATE_OU_CHILDREN = "UPDATE organizational_structure "
-            + "SET path = REPLACE(path, "
+            + "SET path = REGEXP_REPLACE(path, "
             + "                   ?, "
             + "                   ?) "
             + "WHERE path like  ?  || '%'";
@@ -160,7 +161,7 @@ public class OrganizationalStructureRepository {
                 ouRelation.getOrganizationUnit());
 
         result += jdbcTemplate.update(UPDATE_OU_CHILDREN,
-                ouRelation.getPath(),
+                "^" + Pattern.quote(ouRelation.getPath()),
                 ouUpdatedPath,
                 ouRelation.getPath());
 
@@ -195,7 +196,8 @@ public class OrganizationalStructureRepository {
                 newOuId,
                 ouRelation.getOrganizationUnit());
 
-        result += jdbcTemplate.update(UPDATE_OU_CHILDREN, ouRelation.getPath(),
+
+        result += jdbcTemplate.update(UPDATE_OU_CHILDREN, "^" + Pattern.quote(ouRelation.getPath()),
                 newOuPath + ouRelation.getOrganizationUnit() + ".",
                 ouRelation.getPath());
 
