@@ -1,5 +1,4 @@
- 
-# Set-up
+ # Set-up
 
 This projects requires Java 8 or later, Apache Maven 3 or later, and a working Docker set-up.
 
