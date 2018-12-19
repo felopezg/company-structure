@@ -1,0 +1,2 @@
+CREATE TABLE organization_units(  id INT PRIMARY KEY,   name VARCHAR(50),   description VARCHAR(250));
+CREATE TABLE organizational_structure(organization_unit INT NOT NULL, reports_to INT NOT NULL, path VARCHAR(60000) NOT NULL);

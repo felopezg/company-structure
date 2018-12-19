@@ -1,0 +1,22 @@
+version: '3'
+services:
+  h2:
+    image: oscarfonts/h2
+    container_name: h2-organizational-structure
+    volumes:
+      - "./data_dir:/opt/h2-data"
+    ports:
+      - 1521:1521
+      - 81:81
+    restart: always
+  spring-boot-app:
+    depends_on:
+    - h2
+    image: company-structure
+    build: .
+    container_name: company-structure
+    links:
+    - h2
+    ports:
+    - "8080:8080"
+    restart: always
