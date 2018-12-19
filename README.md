@@ -5,18 +5,18 @@ This projects requires Java 8 or later, Apache Maven 3 or later, and a working D
 
 # Maven + Docker
 
-The project uses Spotify’s Dockerfile Maven plugin to integrate Maven with Docker,  although the Docker image build and push phases are not bound.
+This project uses Spotify’s Dockerfile Maven plugin to integrate Maven integrate with Docker,  although the Docker image build and push phases are not bound.
 
-To get the Docker image run:
+To get the Docker image execute the following from the commandline:
 
 `mvn dockerfile:build`
 
-To push the Docker image run:
+To push the Docker image execute the following from the commandline:
 
 `mvn dockerfile:push`
 
 # Docker 
 
-To create and start a container run:
+To create and start a container execute the following from the commandline:
 
 `docker-compose up`
