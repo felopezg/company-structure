@@ -40,7 +40,7 @@ Replace a node´s parent with an existing node in the tree (HTTP 400 if it creat
 
 `http://localhost:8080/v1.0.0/organization-units/[id]`
 
-`{"organizationUnit": [id-will-report-to] }
+`{"organizationUnit": [id-will-report-to]}`
 
 Replace a node´s parent with a new node:
 
@@ -48,7 +48,7 @@ Replace a node´s parent with a new node:
 
 `http://localhost:8080/v1.0.0/organization-units/[id]`
 
-`{"organizationUnit": -1 }
+`{"organizationUnit": -1 }`
 
 
 
