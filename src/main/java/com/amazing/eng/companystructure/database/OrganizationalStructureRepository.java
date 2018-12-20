@@ -35,7 +35,9 @@ public class OrganizationalStructureRepository {
      * Reports-to-Relation
      */
     private static final String SELECT_DO_OUS_FOR_PARENT_CHANGE_EXIST =
-            "SELECT organization_unit, reports_to, path "
+            "SELECT organization_unit, reports_to, path, "
+                    + "LENGTH(REGEXP_REPLACE(path,'[^.]','')) - 1 AS height,"
+                    + "CAST(LEFT(path, LOCATE('.', path,  1) - 1) AS INT) AS root "
                     + "FROM organizational_structure "
                     + "WHERE organization_unit IN (?,?)";
     /**
@@ -44,7 +46,7 @@ public class OrganizationalStructureRepository {
      */
     private static final String SELECT_OU_DEPENDANTS =
             "SELECT organization_unit, reports_to, LENGTH(REGEXP_REPLACE(path,'[^.]','')) - 1 AS height, "
-                    + "  CAST(LEFT(path, LOCATE('.', path,  1) - 1) AS INT) AS root "
+                    + "CAST(LEFT(path, LOCATE('.', path,  1) - 1) AS INT) AS root "
                     + "FROM organizational_structure "
                     + "WHERE path LIKE  (SELECT path FROM organizational_structure WHERE organization_unit = ?) || '%' "
                     + "ORDER BY path";
@@ -57,8 +59,11 @@ public class OrganizationalStructureRepository {
                     + "CAST(LEFT(path, LOCATE('.', path,  1) - 1) AS INT) AS root "
                     + "FROM organizational_structure "
                     + "WHERE organization_unit =  ?  ";
+
     private static final String SELECT_OU_REPORTS_TO_PATH =
-            "SELECT organization_unit, reports_to, path, SUBSTRING(path, 1, LOCATE('.', path,  -2)) reports_to_path "
+            "SELECT organization_unit, reports_to, path, SUBSTRING(path, 1, LOCATE('.', path,  -2)) reports_to_path, "
+                    + "LENGTH(REGEXP_REPLACE(path,'[^.]',''))-1 AS height, "
+                    + "CAST(LEFT(path, LOCATE('.', path,  1) - 1) AS INT) AS root "
                     + "FROM organizational_structure "
                     + "WHERE organization_unit  = ?";
     /**
@@ -94,6 +99,8 @@ public class OrganizationalStructureRepository {
                         OrganizationalRelation relation = new OrganizationalRelation(rs.getInt("organization_unit"),
                                 rs.getInt("reports_to"),
                                 rs.getString("path"));
+                        relation.setHeight(rs.getInt("height"));
+                        relation.setRoot(rs.getInt("root"));
                         relations.put(relation.getOrganizationUnit(), relation);
                     }
 
@@ -112,7 +119,9 @@ public class OrganizationalStructureRepository {
                 (rs, i) -> new OrganizationalRelation(rs.getInt("organization_unit"),
                         rs.getInt("reports_to"),
                         rs.getString("path"),
-                        rs.getString("reports_to_path")));
+                        rs.getString("reports_to_path"),
+                        rs.getInt("height"),
+                        rs.getInt("root")));
     }
 
     /**
@@ -151,8 +160,8 @@ public class OrganizationalStructureRepository {
      * @return the number of Organization Units affected
      */
     @Transactional
-    public int updateReportsTo(final OrganizationalRelation ouRelation,
-                               final OrganizationalRelation willReportToRelation) {
+    public OrganizationUnitResponse updateReportsTo(final OrganizationalRelation ouRelation,
+                                                    final OrganizationalRelation willReportToRelation) {
         Assert.notNull(ouRelation, "Organization Unit Self-Relation must not be null.");
         Assert.notNull(ouRelation, "Organization Unit Reports-to-Relation must not be null.");
         final String ouUpdatedPath = willReportToRelation.getPath() + ouRelation.getOrganizationUnit() + ".";
@@ -170,7 +179,8 @@ public class OrganizationalStructureRepository {
             this.logger.debug(String.format("Updated records [%d]", result));
         }
 
-        return result;
+        return new OrganizationUnitResponse(ouRelation.getOrganizationUnit(), willReportToRelation.getOrganizationUnit(),
+                willReportToRelation.getHeight() + 1, ouRelation.getRoot());
     }
 
 
@@ -181,11 +191,13 @@ public class OrganizationalStructureRepository {
      * @return the created organizational relation
      */
     @Transactional
-    public OrganizationalRelation createReportsTo(final OrganizationalRelation ouRelation) {
+    public OrganizationUnitResponse createReportsTo(final OrganizationalRelation ouRelation) {
         final int newOuId = jdbcTemplate.queryForObject(SELECT_NEXT_OU_ID, Integer.class);
         final String newOuPath = Stream.of(ouRelation.getReportsToPath(), valueOf(newOuId))
                 .filter(NOT_NULL_OR_EMPTY)
                 .collect(Collectors.joining("")) + ".";
+        final int root = ouRelation.getReportsTo() == -1 ? newOuId : ouRelation.getRoot();
+
 
         int result = jdbcTemplate.update(INSERT_NEW_OU, newOuId, valueOf(newOuId), valueOf(newOuId));
 
@@ -206,7 +218,7 @@ public class OrganizationalStructureRepository {
             this.logger.debug(String.format("Updated records [%d]", result));
         }
 
-        return new OrganizationalRelation(newOuId, ouRelation.getReportsTo(), newOuPath);
+        return new OrganizationUnitResponse(newOuId, ouRelation.getReportsTo(), ouRelation.getHeight(), root);
     }
 
 }

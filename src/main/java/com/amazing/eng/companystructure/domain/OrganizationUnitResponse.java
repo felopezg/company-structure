@@ -2,13 +2,13 @@ package com.amazing.eng.companystructure.domain;
 
 import java.io.Serializable;
 
-public final class OrganizationUnitResponse implements Serializable {
+public class OrganizationUnitResponse implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private int organizationUnit;
-    private int reportsTo;
-    private int height;
-    private int root;
+    protected int organizationUnit;
+    protected int reportsTo;
+    protected int height;
+    protected int root;
 
     /**
      * Public no-arg constructor required.

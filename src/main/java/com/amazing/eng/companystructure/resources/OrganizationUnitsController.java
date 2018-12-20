@@ -9,11 +9,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 import static com.amazing.eng.companystructure.domain.SimpleDomainRulesHelper.*;
 
@@ -83,8 +82,9 @@ public final class OrganizationUnitsController {
         }
 
         if (OK.equals(response)) {
-            ouRepository.updateReportsTo(organizationalRelations.get(ou), organizationalRelations.get(willReportTo));
-            response = getListResponseEntity(ouRepository.getOrganizationUnit(ou));
+            OrganizationUnitResponse updated = ouRepository.updateReportsTo(organizationalRelations.get(ou),
+                    organizationalRelations.get(willReportTo));
+            response = getListResponseEntity(Arrays.asList(updated));
         }
 
         return response;
@@ -110,16 +110,10 @@ public final class OrganizationUnitsController {
         }
 
         if (OK.equals(response)) {
-            OrganizationalRelation newRelation = ouRepository.createReportsTo(organizationalRelation.get(0));
+            OrganizationUnitResponse newOrganizationUnitResponse =
+                    ouRepository.createReportsTo(organizationalRelation.get(0));
 
-            String[] path = newRelation.getPath().split(Pattern.quote("."));
-
-            List<OrganizationUnitResponse> organizationUnitResponses = new ArrayList<>();
-            organizationUnitResponses.add(new OrganizationUnitResponse(newRelation.getOrganizationUnit(),
-                    newRelation.getReportsTo(), path.length - 1,
-                    Integer.parseInt(path[0])));
-
-            response = new ResponseEntity<>(organizationUnitResponses, HttpStatus.OK);
+            response = new ResponseEntity<>(Arrays.asList(newOrganizationUnitResponse), HttpStatus.OK);
         }
 
         return response;
