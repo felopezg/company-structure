@@ -22,37 +22,20 @@ To create and start a container execute the following from the commandline:
 
 # Usage
 
-Get a node (Organization Unit):
+* Get a node (Organization Unit):  
+   `HTTP-GET`  
+   `http://localhost:8080/v1.0.0/organization-units/[id]`
 
-`HTTP-GET`
+* Get a node's children (Organization Unit's dependants):  
+   `HTTP-GET`
+   `http://localhost:8080/v1.0.0/organization-units/[id]`
 
-`http://localhost:8080/v1.0.0/organization-units/[id]`
+* Replace a node´s parent with an existing node in the tree (HTTP 400 if it creates a cycle):  
+   `HTTP-PUT`  
+   `http://localhost:8080/v1.0.0/organization-units/[id]`  
+   `{"organizationUnit": [id-will-report-to]}`
 
-Get a node's children (Organization Unit's dependants):
-
-`HTTP-GET`
-
-`http://localhost:8080/v1.0.0/organization-units/[id]`
-
-Replace a node´s parent with an existing node in the tree (HTTP 400 if it creates a cycle):
-
-`HTTP-PUT`
-
-`http://localhost:8080/v1.0.0/organization-units/[id]`
-
-`{"organizationUnit": [id-will-report-to]}`
-
-Replace a node´s parent with a new node:
-
-`HTTP-POST`
-
-`http://localhost:8080/v1.0.0/organization-units/[id]`
-
-`{"organizationUnit": -1 }`
-
-
-
-
-
-
-
+* Replace a node´s parent with a new node:  
+   `HTTP-POST`  
+   `http://localhost:8080/v1.0.0/organization-units/[id]`  
+   `{"organizationUnit": -1 }`
