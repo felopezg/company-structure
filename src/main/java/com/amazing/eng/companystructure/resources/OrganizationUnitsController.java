@@ -91,8 +91,8 @@ public final class OrganizationUnitsController {
     }
 
     /**
-     * Replaces the Organization Unit's Reports-To-Relation with a new Organization Unit. The height for
-     * Organization Unit and its dependants will be now be height + 1.
+     * Replaces the Organization Unit's Reports-To-Relation with a new Organization Unit. The new height for the
+     * Organization Unit and its dependants will be their current height + 1.
      *
      * @param ou           the Organization Unit to replace its Reports-to-Relation
      * @param willReportTo the Organization-Unit for creating the new Reports-to-Relation

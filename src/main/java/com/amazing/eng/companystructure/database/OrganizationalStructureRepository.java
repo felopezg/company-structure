@@ -30,6 +30,16 @@ public class OrganizationalStructureRepository {
             "INSERT INTO organization_units (id, name, description) VALUES (?, ?, ?)";
     private static final String INSERT_INTO_ORGANIZATIONAL_STRUCTURE =
             "INSERT INTO organizational_structure (organization_unit, reports_to, path) VALUES (?, ?, ?)";
+
+    /**
+     * SQL statement for retrieving the Organization Unit's direct dependants.
+     * Regex to use '^' + parent_path + '[0-9]+.$'
+     */
+    private static final String SELECT_OU_DIRECT_DEPENDANTS =
+            "SELECT organization_unit, reports_to, path " +
+                    "FROM organizational_structure " +
+                    "WHERE REGEXP_LIKE(PATH, ?)";
+
     /**
      * SQL statement for retrieving the Organizational-Relations needed for updating an Organization Unit's
      * Reports-to-Relation
@@ -111,7 +121,7 @@ public class OrganizationalStructureRepository {
     /**
      * Retrieves the Organizational-Relations needed for replacing an Organization Unit's Reports-to-Relation
      *
-     * @return an Optional containing all the relations found.
+     * @return if found a list containing the relations found.
      */
     public List<OrganizationalRelation> getOrganizationalRelations(int ou) {
         return jdbcTemplate.query(SELECT_OU_REPORTS_TO_PATH,
@@ -172,7 +182,8 @@ public class OrganizationalStructureRepository {
         result += jdbcTemplate.update(UPDATE_OU_CHILDREN,
                 "^" + Pattern.quote(ouRelation.getPath()),
                 ouUpdatedPath,
-                ouRelation.getPath());
+                ouRelation.getPath()); //This transaction can be reduced/optimized to only this update statement as the
+                                      // table does not necessarily needs the reports_to column.
 
         if (this.logger.isDebugEnabled()) {
             this.logger.debug(String.format("Updated relation [%s, %s]", ouRelation.getPath(), ouUpdatedPath));
@@ -211,7 +222,8 @@ public class OrganizationalStructureRepository {
 
         result += jdbcTemplate.update(UPDATE_OU_CHILDREN, "^" + Pattern.quote(ouRelation.getPath()),
                 newOuPath + ouRelation.getOrganizationUnit() + ".",
-                ouRelation.getPath());
+                ouRelation.getPath()); //This transaction can be reduced/optimized by removing the previous update
+                                      // statement as the table does not necessarily needs the reports_to column.
 
         if (this.logger.isDebugEnabled()) {
             this.logger.debug(String.format("New relation [%d, %s]", newOuId, newOuPath));
