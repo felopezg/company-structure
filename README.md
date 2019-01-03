@@ -28,7 +28,7 @@ To create and start a container execute the following from the commandline:
 
 * Get a node's children (Organization Unit's dependants):  
    `HTTP-GET`
-   `http://localhost:8080/v1.0.0/organization-units/[id]`
+   `http://localhost:8080/v1.0.0/organization-units/[id]//dependants`
 
 * Replace a node´s parent with an existing node in the tree (HTTP 400 if it creates a cycle):  
    `HTTP-PUT`  
